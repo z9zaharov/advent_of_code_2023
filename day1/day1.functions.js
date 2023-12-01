@@ -2,105 +2,48 @@
  * --- Day 1: Trebuchet?! ---
  */
 
- function parseInputData(data, separator) {
+ function parseInputData(data) {
   return data.map(line => line.trim());
 }
 
 const Trebuchet = function () {
 
-  this.regex = /[1-9]|one|two|three|four|five|six|seven|eight|nine/;
+  this.regex = /[1-9]/gi;
+  this.regexSpelled = /[1-9]|one|two|three|four|five|six|seven|eight|nine/gi;
   this.Digits = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
 
-  this.calibrate = (lines, findValue) => {
+  this.calibrate = (lines, isSpelled = false) => {
     return lines.reduce((sum, line) => {
-      return sum + findValue(line);
+      let val = (isSpelled) ? this.findDigits(line, true) : this.findDigits(line);
+      return sum + val;
     }, 0);
   }
 
-  this.findValue = (line) => {
-    let i = 0, j = line.length - 1;
-    let isLeft = false, isRight = false;
-    let result = '';
-
-    while(i <= j && !(isLeft && isRight)) {
-      if (!isLeft && this.isDigit(line[i])) {
-        result = '' + line[i] + result;
-        isLeft = true;
-      }
-    
-      if (!isRight && this.isDigit(line[j])) {
-        result = '' + result + line[j];
-        isRight = true;
-      }
-
-      if (!isLeft)
-        i ++; 
-      if (!isRight) 
-        j --;
-    }
-
-    if (i > j && result.length == 1) {
-      result = '' + result + result;
-    }
-
-    return parseInt(result);
+  this.findDigits = (line, isSpelled = false) => {
+    return (isSpelled) ? this.findRegex(line, this.regexSpelled) : this.findRegex(line, this.regex);
   }
 
-  this.findValue2 = (line) => {
-    let i = 0, j = line.length - 1;
-    let isLeft = false, isRight = false;
-    let result = '';
-
-    while(i <= j && !(isLeft && isRight)) {
-      if (!isLeft) {
-        if (this.isDigit(line[i])) {
-          result = '' + line[i] + result;
-          isLeft = true;
-        }
-        let digitSpelled = this.isDigitSpelled(line, i, true);
-        if (digitSpelled) {
-          i = i + this.Digits[digitSpelled - 1].length;
-          result = '' + digitSpelled + result;
-          isLeft = true;
-        }
-      }
-    
-      if (!isRight) {
-        if (this.isDigit(line[j])) {
-          result = '' + result + line[j];
-          isRight = true;
-        }
-        let digitSpelled = this.isDigitSpelled(line, j, false);
-        if (digitSpelled) {
-          j = j - this.Digits[digitSpelled - 1].length;
-          result = '' + result + digitSpelled;
-          isRight = true;
-        }
-      } 
-
-      if (!isLeft)
-        i ++; 
-      if (!isRight) 
-        j --;
+  this.findRegex = (line, regex) => {
+    var m, matches = [];
+    while (m = regex.exec(line)) {
+      regex.lastIndex = m.index + 1;
+      matches.push(m[0]);
     }
 
-    if (i > j && result.length == 1) {
-      result = '' + result + result;
-    }
-
-    return parseInt(result);
+    return (matches.length > 1) 
+            ? this.getNumeric(matches[0]) * 10 + this.getNumeric(matches[matches.length - 1]) 
+            : (matches.length == 1) 
+                ? this.getNumeric(matches[0]) * 10 + this.getNumeric(matches[0]) 
+                : 0;
   }
 
-  this.isDigit = (c) => c >= '0' && c <= '9';
-
-  this.isDigitSpelled = (line, idx, dir) => {
-    for(let i = 0; i < this.Digits.length; i ++) {
-      let from = (dir) ? idx : idx - this.Digits[i].length + 1;
-      if (line.substr(from, this.Digits[i].length) == this.Digits[i]) {
-        return i + 1;
-      }
+  this.getNumeric = (val) => {
+    if (val && val.length == 1 && val >= '0' && val <= '9') {
+      return parseInt(val);
     }
-    return 0;
+    else {
+      return this.Digits.indexOf(val) + 1;
+    }
   }
 }
 

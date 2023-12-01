@@ -8,7 +8,7 @@ function step1(input) {
   let data = parseInputData(input, /\r\n/);
 
   let trebuchet = new Trebuchet();
-  let res = trebuchet.calibrate(data, trebuchet.findValue);
+  let res = trebuchet.calibrate(data);
 
   return res;
 }
@@ -17,7 +17,7 @@ function step2(input) {
   let data = parseInputData(input, /\r\n/);
 
   let trebuchet = new Trebuchet();
-  let res = trebuchet.calibrate(data, trebuchet.findValue2);
+  let res = trebuchet.calibrate(data, true);
 
   return res;
 }
