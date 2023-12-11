@@ -1,5 +1,5 @@
 /**
- * --- Day 9: Mirage Maintenance ---
+ * --- Day 11: Cosmic Expansion ---
  */
 import { getBlocks } from '../utils/utils.js';
 import { parseInputData, CosmicExpansion } from "../day11/day11.functions.js";

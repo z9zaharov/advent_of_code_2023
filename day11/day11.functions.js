@@ -1,5 +1,5 @@
 /**
- * --- Day 9: Mirage Maintenance ---
+ * --- Day 11: Cosmic Expansion ---
  */
 
  function parseInputData(data, separator) {
@@ -45,7 +45,7 @@ const CosmicExpansion = function () {
     let betweenRows = this.getBetween(galaxy1.y, galaxy2.y, empties.rows);
     let betweenCols = this.getBetween(galaxy1.x, galaxy2.x, empties.cols);
 
-    return Math.abs(galaxy1.y - galaxy2.y) + (betweenRows * scale - betweenRows) + Math.abs(galaxy1.x - galaxy2.x) + (betweenCols * scale - betweenCols);
+    return Math.abs(galaxy1.y - galaxy2.y) + betweenRows * (scale - 1) + Math.abs(galaxy1.x - galaxy2.x) + betweenCols * (scale - 1);
   }
 
   this.getGalaxies = (data) => {

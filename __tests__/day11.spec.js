@@ -2,7 +2,7 @@ import { expect } from "@jest/globals";
 import { parseInputData, CosmicExpansion } from "../day11/day11.functions.js";
 import { split_blocks } from '../utils/utils.js';
 
-describe("--- Day 9: Mirage Maintenance ---", () => {
+describe("--- Day 11: Cosmic Expansion ---", () => {
 
   function get_input() {
     let input = `...#......
