@@ -11,7 +11,6 @@ const ReflectorDish = function () {
   this.pointNorth = (data, y, x) => {
     if (y > 0 && data[y - 1][x] == '.') {
       data[y - 1][x] = 'O';
-      data[y][x] = '.';
       return 1;
     }
     return 0;
@@ -20,7 +19,6 @@ const ReflectorDish = function () {
   this.pointWest = (data, y, x) => {
     if(x > 0 && data[y][x - 1] == '.') {
       data[y][x - 1] = 'O';
-      data[y][x] = '.';
       return 1;
     }
     return 0;
@@ -29,7 +27,6 @@ const ReflectorDish = function () {
   this.pointSouth = (data, y, x) => {
     if(y < data.length - 1 && data[y + 1][x] == '.') {
       data[y + 1][x] = 'O';
-      data[y][x] = '.';
       return 1;
     }
     return 0;
@@ -38,7 +35,6 @@ const ReflectorDish = function () {
   this.pointEast = (data, y, x) => {
     if(x < data[y].length - 1 && data[y][x + 1] == '.') {
       data[y][x + 1] = 'O';
-      data[y][x] = '.';
       return 1;
     }
     return 0;
@@ -48,8 +44,9 @@ const ReflectorDish = function () {
     let falls = 0;
     for(let i = 0; i < data.length; i ++) {
       for(let j = 0; j < data[i].length; j ++) {
-        if (data[i][j] == 'O') {
-          falls += pointStep(data, i, j);
+        if (data[i][j] == 'O' && pointStep(data, i, j)) {
+          data[i][j] = '.';
+          falls ++;
         }
       }
     }
