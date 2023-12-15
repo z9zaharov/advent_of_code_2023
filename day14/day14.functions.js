@@ -9,7 +9,7 @@ function parseInputData(data, separator) {
 const ReflectorDish = function () {
 
   this.pointNorth = (data, y, x) => {
-    if (data[y][x] == 'O' && y > 0 && data[y - 1][x] == '.') {
+    if (y > 0 && data[y - 1][x] == '.') {
       data[y - 1][x] = 'O';
       data[y][x] = '.';
       return 1;
@@ -18,7 +18,7 @@ const ReflectorDish = function () {
   }
 
   this.pointWest = (data, y, x) => {
-    if (data[y][x] == 'O' && x > 0 && data[y][x - 1] == '.') {
+    if(x > 0 && data[y][x - 1] == '.') {
       data[y][x - 1] = 'O';
       data[y][x] = '.';
       return 1;
@@ -27,7 +27,7 @@ const ReflectorDish = function () {
   }
 
   this.pointSouth = (data, y, x) => {
-    if (data[y][x] == 'O' && y < data.length - 1 && data[y + 1][x] == '.') {
+    if(y < data.length - 1 && data[y + 1][x] == '.') {
       data[y + 1][x] = 'O';
       data[y][x] = '.';
       return 1;
@@ -36,7 +36,7 @@ const ReflectorDish = function () {
   }
 
   this.pointEast = (data, y, x) => {
-    if (data[y][x] == 'O' && x < data[y].length - 1 && data[y][x + 1] == '.') {
+    if(x < data[y].length - 1 && data[y][x + 1] == '.') {
       data[y][x + 1] = 'O';
       data[y][x] = '.';
       return 1;
@@ -48,7 +48,9 @@ const ReflectorDish = function () {
     let falls = 0;
     for(let i = 0; i < data.length; i ++) {
       for(let j = 0; j < data[i].length; j ++) {
-        falls += pointStep(data, i, j);
+        if (data[i][j] == 'O') {
+          falls += pointStep(data, i, j);
+        }
       }
     }
     return falls;
@@ -64,10 +66,11 @@ const ReflectorDish = function () {
   }
 
   this.moveCycle = (data) => {
-    this.fall(data, this.pointNorth);
-    this.fall(data, this.pointWest);
-    this.fall(data, this.pointSouth);
-    this.fall(data, this.pointEast);
+    [ this.pointNorth, 
+      this.pointWest, 
+      this.pointSouth, 
+      this.pointEast
+    ].forEach(func => this.fall(data, func));
   }
 
   this.countAfterMultiCycles = (data, cycles = 1000000000) => {
@@ -92,20 +95,17 @@ const ReflectorDish = function () {
       this.moveCycle(data);
     }
 
-    return this.northBeams(data);
+    return this.sumBeams(data, this.northBeamSumFunc);
   }
 
   this.beamKey = (data) => {
-    return "$" + this.sumBeams(data, this.northBeamSumFunc) + "_" + this.eastBeams(data) + "_" + this.southBeams(data) + "_" + this.westBeams(data);
+    let funcs = [this.northBeamSumFunc, this.southBeamsSumFunc, this.westBeamsSumFunc, this.eastBeamsSumFunc];
+    return "$" + funcs.map(func => this.sumBeams(data, func)).join("_");
   }
 
   this.countNorth = (data) => {
     this.fall(data, this.pointNorth);
-    return this.northBeams(data);
-  }
-
-  this.northBeamSumFunc = (data, i) => {
-    return (data.length - i);
+    return this.sumBeams(data, this.northBeamSumFunc);
   }
 
   this.sumBeams = (data, func) => {
@@ -113,60 +113,17 @@ const ReflectorDish = function () {
     for(let i = 0; i < data.length; i ++) {
       for(let j = 0; j < data[i].length; j ++) {
         if (data[i][j] == 'O') {
-          sum += func(data, i);
+          sum += func(data, i, j);
         }
       }
     }
     return sum;
   }
 
-  this.northBeams = (data) => {
-    let sum = 0;
-    for(let i = 0; i < data.length; i ++) {
-      for(let j = 0; j < data[i].length; j ++) {
-        if (data[i][j] == 'O') {
-          sum += (data.length - i);
-        }
-      }
-    }
-    return sum;
-  }
-
-  this.eastBeams = (data) => {
-    let sum = 0;
-    for(let i = 0; i < data.length; i ++) {
-      for(let j = 0; j < data[i].length; j ++) {
-        if (data[i][j] == 'O') {
-          sum += (data[j].length - j);
-        }
-      }
-    }
-    return sum;
-  }
-
-  this.southBeams = (data) => {
-    let sum = 0;
-    for(let i = 0; i < data.length; i ++) {
-      for(let j = 0; j < data[i].length; j ++) {
-        if (data[i][j] == 'O') {
-          sum += (i + 1);
-        }
-      }
-    }
-    return sum;
-  }
-
-  this.westBeams = (data) => {
-    let sum = 0;
-    for(let i = 0; i < data.length; i ++) {
-      for(let j = 0; j < data[i].length; j ++) {
-        if (data[i][j] == 'O') {
-          sum += (j + 1);
-        }
-      }
-    }
-    return sum;
-  }
+  this.northBeamSumFunc = (data, i, j) => data.length - i;
+  this.eastBeamsSumFunc = (data, i, j) => data[j].length - j;
+  this.southBeamsSumFunc = (data, i, j) => i + 1;
+  this.westBeamsSumFunc = (data, i, j) => j + 1;
 }
 
 export { parseInputData, ReflectorDish };
