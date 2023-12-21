@@ -118,7 +118,8 @@ const PulsePropagation = function () {
             }
             else {
               // multiply all push button count to get number of push buttons to get rx 0
-              return Object.keys(seen).reduce((mult, key) => mult * seen[key], 1);
+              let values = Object.keys(seen).map(key => seen[key]);
+              return this.getLcm(values);
             }
           }
           queue = this.pulseModule(module, stepModules.state, modules, queue, stepModules.from);
@@ -126,6 +127,32 @@ const PulsePropagation = function () {
       }
       pushes ++;
     }
+  }
+
+  this.getDividers = (num) => {
+    let dividers = [];
+    for(let i = 1; i < num / 2 + 1; i ++) {
+      if (num % i == 0) {
+        dividers.push(i);
+      }
+    }
+    if (dividers.length == 1) {
+      dividers.push(num);
+    }
+    return dividers;
+  }
+
+  this.getLcm = (seenValues) => {
+    let minDividers = seenValues.reduce((dividers, num) => { 
+      let numDividers = this.getDividers(num);
+
+      dividers = [...dividers, ...numDividers];
+      return dividers; 
+    }, []);
+    minDividers = minDividers.filter((c, i) => minDividers.indexOf(c) === i);
+
+    let lcm = minDividers.reduce((mult, div) => mult * div, 1);
+    return lcm;
   }
 
   this.run = (modules, count) => {
